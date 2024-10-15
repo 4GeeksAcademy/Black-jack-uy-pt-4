@@ -20,9 +20,13 @@ const Home = () => {
 	const pintas = ['♦','♥','♠','♣'];
 	const valores = ['A',2,3,4,5,6,7,8,9,10,'J','Q','K'];
 
-	const [ manoDeCartas, setManoDeCartas ] = useState([])
+	const [ player, setPlayer ] = useState('');
 
-	const [ cuenta, setCuenta ] = useState(0)
+	const [ inputName, setInputName ] = useState('');
+
+	const [ manoDeCartas, setManoDeCartas ] = useState([]);
+
+	const [ cuenta, setCuenta ] = useState(0);
 
 	const generateRandomCard = () => {
 		return {
@@ -35,13 +39,17 @@ const Home = () => {
 	useEffect(()=>{
 		// se ejecutara una unica vez
 		console.log('Hola el componente Home ha nacido!') 
-		setManoDeCartas([ ...manoDeCartas, generateRandomCard() ])
-		console.log(manoDeCartas);
-	}, []) // <---
+		calcularCuenta()
+	}, [])
 
 	const calcularCuenta = () => {
 		for(let carta of manoDeCartas){
-			if (carta.valor == 'A') {
+			
+			if (cuenta == 10 && carta.valor == 'A') {
+				setCuenta(cuenta + 11) 
+				continue;
+			}
+			if( cuenta <= 20 && carta.valor == 'A') {
 				setCuenta(cuenta + 1)
 				continue;
 			}
@@ -49,7 +57,8 @@ const Home = () => {
 				setCuenta(cuenta + 10)
 				continue;
 			}
-			setCuenta(cuenta + carta.valor)
+			setCuenta(cuenta + parseInt(carta.valor))
+			continue;
 		}
 	}
 
@@ -58,23 +67,38 @@ const Home = () => {
 		calcularCuenta()
 	},[manoDeCartas])
 
-
 	return (<>
 		<div className="d-flex flex-row  my-auto gap-2">
-
+			{ !player && <>
+				<h1>Bienvenido </h1>
+				<input placeholder="player" type="text" value={inputName}
+					onChange={ evento => setInputName(evento.target.value)}
+				/>
+				<button className="btn btn-warning"
+					onClick={() => setPlayer(inputName)}
+				>
+					Salvar
+				</button>
+			</>
+			}
 			{
+				
 				manoDeCartas.map( (carta, index) => <Card key={index} 
 					pinta={carta.pinta} valor={carta.valor} 
 				/>)
 			}
 
 		</div>
-		<button className="btn btn-warning mt-1"
-			onClick={() => setManoDeCartas([ ...manoDeCartas, generateRandomCard() ])}
-		>
-			Pedir
-		</button>
-		<h1 className="text-white">Total: {cuenta}</h1>
+			{ player != '' && <>
+					<h1> Jugando como {player} </h1>
+					<button className="btn btn-warning mt-1"
+						onClick={() => setManoDeCartas([ ...manoDeCartas, generateRandomCard()])}
+					>
+						Pedir
+					</button>
+					<h1 className="text-white">Total: {cuenta}</h1>
+				</>
+			}
 		</>
 	);
 };
