@@ -26,6 +26,8 @@ const Home = () => {
 
 	const [ manoDeCartas, setManoDeCartas ] = useState([]);
 
+	const [manoDeCartasCasa, setManoDeCartasCasa] = useState([])
+
 	const [ cuenta, setCuenta ] = useState(0);
 
 	const [ blackJack, setBlackJack ] = useState(null);
@@ -71,6 +73,10 @@ const Home = () => {
 		}
 	}
 
+	useEffect( () => {
+		setManoDeCartasCasa([ generateRandomCard(), generateRandomCard() ])
+	},[])
+
 	useEffect(()=>{
 		calcularCuenta()
 	},[manoDeCartas])
@@ -93,16 +99,29 @@ const Home = () => {
 				</button>
 			</>
 			}
-			{
-				
-				manoDeCartas.map( (carta, index) => <Card key={index} 
-					pinta={carta.pinta} valor={carta.valor} 
-				/>)
-			}
+
+			<div className="d-flex flex-column text-center w-100">
+				{ player && <h1>Cartas de la casa</h1> }
+				<div className="d-flex flex-row  my-auto gap-2 justify-content-center w-100">
+					{
+						player && manoDeCartasCasa.map( (carta, index) => <Card key={index} 
+							pinta={carta.pinta} valor={carta.valor} 
+						/>)
+					}
+				</div>
+			</div>
 
 		</div>
 			{ player != '' && <>
 					<h1> Jugando como {player} </h1>
+					<div className="d-flex flex-row  my-auto gap-2">
+						{
+							manoDeCartas.map( (carta, index) => <Card key={index} 
+								pinta={carta.pinta} valor={carta.valor} 
+							/>)
+						}
+					</div>
+
 					{
 						blackJack == null &&
 						<button className="btn btn-warning mt-1"
@@ -111,6 +130,10 @@ const Home = () => {
 							Pedir
 						</button>
 					}
+
+					<h1 className="text-white">Total: {cuenta}</h1>
+					{  blackJack == false && <h1 className="text-danger">Perdiste</h1>	}
+					{  blackJack  && <h1 className="text-white">Ganaste</h1>	}
 
 					{
 						blackJack !== null && <>
@@ -127,9 +150,6 @@ const Home = () => {
 						</>
 					}
 
-					<h1 className="text-white">Total: {cuenta}</h1>
-					{  blackJack == false && <h1 className="text-danger">Perdiste</h1>	}
-					{  blackJack  && <h1 className="text-white">Ganaste</h1>	}
 				</>
 			}
 		</>
