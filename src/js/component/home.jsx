@@ -28,6 +28,8 @@ const Home = () => {
 
 	const [ cuenta, setCuenta ] = useState(0);
 
+	const [ blackJack, setBlackJack ] = useState(null);
+
 	const generateRandomCard = () => {
 		return {
 			pinta: pintas[Math.floor(Math.random()*pintas.length)],
@@ -35,12 +37,19 @@ const Home = () => {
 		}
 	}
 
+	const isVictory = () => {
+		if ( cuenta == 21 ){
+			setBlackJack(true)
+			return
+		}
+		if (cuenta > 21 ){
+			setBlackJack(false)
+			return
+		}
+		setBlackJack(null)
+		return
+	}
 
-	useEffect(()=>{
-		// se ejecutara una unica vez
-		console.log('Hola el componente Home ha nacido!') 
-		calcularCuenta()
-	}, [])
 
 	const calcularCuenta = () => {
 		for(let carta of manoDeCartas){
@@ -63,9 +72,12 @@ const Home = () => {
 	}
 
 	useEffect(()=>{
-		// se ejecuta cada vez que cambia la mano de cartas
 		calcularCuenta()
 	},[manoDeCartas])
+
+	useEffect(()=>{
+		isVictory()
+	}, [cuenta])
 
 	return (<>
 		<div className="d-flex flex-row  my-auto gap-2">
@@ -91,12 +103,33 @@ const Home = () => {
 		</div>
 			{ player != '' && <>
 					<h1> Jugando como {player} </h1>
-					<button className="btn btn-warning mt-1"
-						onClick={() => setManoDeCartas([ ...manoDeCartas, generateRandomCard()])}
-					>
-						Pedir
-					</button>
+					{
+						blackJack == null &&
+						<button className="btn btn-warning mt-1"
+							onClick={() => setManoDeCartas([ ...manoDeCartas, generateRandomCard()])}
+						>
+							Pedir
+						</button>
+					}
+
+					{
+						blackJack !== null && <>
+							<button className="btn btn-info mt-1"
+								onClick={() => {
+									setCuenta(0)
+									setManoDeCartas([])
+									setBlackJack(null)
+									// setPlayer('') Reiniciar el nombre de jugador tambien
+								}}
+							>
+								Jugar de Nuevo
+							</button>
+						</>
+					}
+
 					<h1 className="text-white">Total: {cuenta}</h1>
+					{  blackJack == false && <h1 className="text-danger">Perdiste</h1>	}
+					{  blackJack  && <h1 className="text-white">Ganaste</h1>	}
 				</>
 			}
 		</>
